@@ -3,7 +3,7 @@ import scipy.stats as sp
 import keras
 import seq2seq
 from seq2seq.models import Seq2Seq
-from sys import exit, argv
+from sys import argv
 from random import choice, shuffle
 from matplotlib.pyplot import plot, ylabel, show, legend, xlabel
 
@@ -318,7 +318,7 @@ if EXP == "3":
 								]))
 		OUT_file.write("\n")
 else:
-	OUT_file = open("Marcus Simulations (Exp "+EXP+" - Dropout="+str(DROPOUT)+", Pattern="+PATTERN+", "+str(REDUP_IN_PT)+").csv", "w")
+	OUT_file = open("Marcus Simulations (Exp "+EXP+" - Dropout="+str(DROPOUT)+", Pattern="+PATTERN+", Pretraining Redup Prob="+str(REDUP_IN_PT)+").csv", "w")
 	OUT_file.write("Loss for ABB Test Data,Loss for ABA Test Data,Loss on Training Data")
 	OUT_file.write("\n")
 	for trial in range(len(abb_losses)):
