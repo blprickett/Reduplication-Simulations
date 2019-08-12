@@ -137,7 +137,7 @@ all_sylls = list(set(sylls))
 if PATTERN == "ABB":
 	this_td = train_ABB
 elif PATTERN == "ABA":
-	this_td = train+ABA
+	this_td = train_ABA
 elif PATTERN == "AAB":
 	this_td = train_AAB
 else:
@@ -225,22 +225,9 @@ for rep in range(REPS):
 		##Putting reduplication in training:
 			if np.random.rand() < REDUP_IN_PT:
 				syll_alpha = choice(all_sylls)
-				#template = choice(["ABB", "ABA"])
-				#if template == "ABB":
-				#	string_X = choice(all_sylls)+syll_alpha
-				#elif template == "ABA":
-				#	string_X = syll_alpha+choice(all_sylls)
+				string_X = choice(all_sylls)+syll_alpha #AB...
 		  
-				#string_X = syll_alpha+syll_alpha
-		  
-				#string_X = syll_alpha+choice(all_sylls)  #ABA
-				string_X = choice(all_sylls)+syll_alpha #ABB
-		  
-				#template = choice(["wofewo", "dekode"])
-				#string_X = template[:4]
-				#string_Y = template[4:]
-				
-				string_Y = syll_alpha
+				string_Y = syll_alpha #...B
 			else:
 			  string_X = choice(all_sylls)+choice(all_sylls)
 			  string_Y = choice(all_sylls)
