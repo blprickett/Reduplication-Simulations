@@ -4,7 +4,7 @@ The script "marcus_simulations.py" is made to simulate the experiments from Marc
 
 ## Dependencies
 
-To run "marcus_simulations.py", you'll need the following Python packages:
+To run "marcus_simulations.py", you'll need the following Python packages (and Python 3):
 
 * numpy
 * scipy
