@@ -1,6 +1,6 @@
 # Reduplication Experiment Simulations
 
-The script "marcus_simulations.py" is made to simulate the experiments from Marcus et al. (1999) with a Sequence-to-Sequence neural network (Sutskever et al. 2014). The script doesn't take any input files, but it does create output files in the directory in which it's run. For more on this software and the theoretical questions that motivated it, see \S4 of [this paper](https://works.bepress.com/joe_pater/38/).
+The script "marcus_simulations.py" is made to simulate the experiments from Marcus et al. (1999) with a Sequence-to-Sequence neural network (Sutskever et al. 2014). The script doesn't take any input files, but it does create output files in the directory in which it's run. For more on this software and the theoretical questions that motivated it, see §4 of [this paper](https://works.bepress.com/joe_pater/38/).
 
 ## Dependencies
 
