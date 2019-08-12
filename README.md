@@ -24,7 +24,7 @@ The script "marcus_simulations.py" takes the following arguments (in this order)
 * Dropout probability: how likely is each unit in the model to be dropped out during training?
 * Pattern: which pattern is present in training? For Experiments 1 and 2, this should be either "ABB" or "ABA". For Experiment 3, it needs to be either "ABB" or "AAB". 
 * Vocabulary size: how many randomly-created words are present in pretraining?
-* Reduplication probability in pretraining: what portion (above chance) of the pretraining contains "ABB" reduplicated forms.
+* Reduplication probability in pretraining: what proportion (above chance) of the pretraining contains "ABB" reduplicated forms?
 
 ## References
 * Endress, A. D., Dehaene-Lambertz, G., & Mehler, J. (2007). Perceptual constraints and the learnability of simple grammars. *Cognition, 105(3)*, 577-614.
