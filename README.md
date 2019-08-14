@@ -6,7 +6,7 @@ The script "generalization_scope_tests.py" is made to more carefully test how th
 
 ## Dependencies
 
-To run "marcus_simulations.py", you'll need the following Python packages (and Python 3):
+To run these scripts, you'll need the following Python packages (and Python 3):
 
 * numpy
 * scipy
@@ -17,6 +17,7 @@ To run "marcus_simulations.py", you'll need the following Python packages (and P
 * sys
 * random
 * matplotlib
+* itertools
 
 ## Command line arguments
 
