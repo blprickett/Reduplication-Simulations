@@ -1,20 +1,23 @@
 import numpy as np
+import keras
 import seq2seq
 from seq2seq.models import Seq2Seq
-from sys import exit, argv
+from sys import argv
 from random import choice, shuffle
 from itertools import product
-from matplotlib.pyplot import plot, ylabel, show, legend, xlabel, ylim
+from matplotlib.pyplot import plot, ylabel, show, legend, xlabel, title
 
 #PAREMETERS:
 ###################################
-epoch_num = 1000 #Number of epochs
-reps = 15
-dropout_prob = 0.75
+EPOCHS = int(argv[1]) #Number of epochs
+REPS = int(argv[2]) #Number of repetitions to run
+DROPOUT = float(argv[3]) #Probability of dropout in the model
+SCOPE = argv[4] #Must be from the set {"feature", "segment", "syllable"}
 ###################################
 
-##BUILD TRAINING DATA##
-FEAT_CONVERT = {	     #syll	son		voice	cor		cont	lab		vel 	nasal 	high	low		tense	ejective
+def novel_feat_data ():
+	#Create these features by hand for better control:
+	feat_convert = {	  #syll	son		voice	cor		cont	lab		vel 	nasal 	high	low		tense	ejective
 					"p": [-1.0,	-1.0,	-1.0,	-1.0, 	-1.0,	1.0,	-1.0,	-1.0,	-1.0,	-1.0,	-1.0,	-1],
 					"b": [-1.0,	-1.0,	1.0,	-1.0, 	-1.0,	1.0,	-1.0,	-1.0,	-1.0,	-1.0,	-1.0,	-1],
 					"t": [-1.0,	-1.0,	-1.0,	1.0, 	-1.0,	-1.0,	-1.0,	-1.0,	-1.0,	-1.0,	-1.0,	-1],
@@ -59,48 +62,138 @@ FEAT_CONVERT = {	     #syll	son		voice	cor		cont	lab		vel 	nasal 	high	low		tens
 					"E": [1.0,	1.0,	1.0,	-1.0, 	1.0,	-1.0,	-1.0,	-1.0,	-1.0,	-1.0,	-1.0,	-1],
 					"U": [1.0,	1.0,	1.0,	-1.0, 	1.0,	1.0,	1.0,	-1.0,	1.0,	-1.0,	-1.0,	-1],
 				}
-withheld_segs = [	
-						 [-1.0,	1.0,	1.0,	1.0, 	-1.0,	-1.0,	-1.0,	1.0,	-1.0,	-1.0,	-1.0,	-1],#[n]
-						 [1.0,	1.0,	1.0,	-1.0, 	-1.0,	-1.0,	1.0,	-1.0,	-1.0,	1.0,	-1.0,	-1] #[a]
-				]
-inventory = list(FEAT_CONVERT.values())
-feat_num = len(inventory[0])
-
 	
-#Construct syllables:
-vowels = [seg for seg in inventory if seg[0] == 1.0]
-consonants = [seg for seg in inventory if seg[0] == -1.0]
-syllables = list(product(consonants, vowels)) #Find all possible syllables using this inventory
-syllables = [list(syll) for syll in syllables] #Convert syllables to lists
+	#Withheld segment is always [n] (since it's value for nasal is 1.0)
+	withheld_seg = [-1.0,	1.0,	1.0,	1.0, 	-1.0,	-1.0,	-1.0,	1.0,	-1.0,	-1.0,	-1.0,	-1] #[n]
+	
+	#Get the list of segments and the number of features:
+	inventory = list(feat_convert.values())
+	feat_num = len(inventory[0])
+	
+	#Create the syllables that are in our training data:
+	vowels = [seg for seg in inventory if seg[0] == 1.0]
+	consonants = [seg for seg in inventory if seg[0] == -1.0]
+	syllables = list(product(consonants, vowels)) #Find all possible syllables using this inventory
+	shuffle(syllables)
+	syllables = [list(syll) for syll in syllables] #Convert syllables to lists
 
+	#Create the withheld syllable:
+	withheld_syll = [withheld_seg, vowels[0]]	
+	
+	return feat_num, withheld_syll, syllables
+	
+def novel_seg_data (seg_num=40):
+	#Calculate number of contrastive features that are necessary:
+	feat_num = int(np.ceil(np.log2(seg_num))) 
+	
+	#Create all possible feature bundles:
+	inventory = list(product([1.0, -1.0], repeat=feat_num)) 
+	
+	#Shuffle all the feature bundles so those that we're left with are random:
+	shuffle(inventory) 
+	
+	#Cut out all the extra feature bundles and convert them to a list
+	inventory = [list(inventory[seg]) for seg in range(len(inventory)) if seg < seg_num] 
+
+	#This ensures that every inventory has at least one vowel:
+	vowel_check = False
+	for segment in inventory:
+		if segment[0] == 1.0: #The first feature will always be [syllabic]
+			vowel_check = True
+			break
+	if not vowel_check:
+		inventory[0][0] = 1.0
+		
+	#Create the syllables that are in our training data:
+	vowels = [seg for seg in inventory if seg[0] == 1.0]
+	consonants = [seg for seg in inventory if seg[0] == -1.0]
+	withheld_seg = consonants.pop()
+	syllables = list(product(consonants, vowels)) #Find all possible syllables using this inventory
+	shuffle(syllables) #Shuffle the syllables
+	syllables = [list(syll) for syll in syllables] #Convert syllables to lists
+
+	#Create the withheld syllable:
+	withheld_syll = [withheld_seg, vowels[0]]
+	
+	return feat_num, withheld_syll, syllables
+	
+def novel_syll_data (seg_num=40):
+	#Calculate number of contrastive features that are necessary:
+	feat_num = int(np.ceil(np.log2(seg_num))) 
+	
+	#Create all possible feature bundles:
+	inventory = list(product([1.0, -1.0], repeat=feat_num)) 
+	
+	#Shuffle all the feature bundles so those that we're left with are random:
+	shuffle(inventory) 
+	
+	#Cut out all the extra feature bundles and convert them to a list
+	inventory = [list(inventory[seg]) for seg in range(len(inventory)) if seg < seg_num] 
+
+	#This ensures that every inventory has at least one vowel:
+	vowel_check = False
+	for segment in inventory:
+		if segment[0] == 1.0: #The first feature will always be [syllabic]
+			vowel_check = True
+			break
+	if not vowel_check:
+		inventory[0][0] = 1.0
+		
+	#Create the syllables that are in our training data:
+	vowels = [seg for seg in inventory if seg[0] == 1.0]
+	consonants = [seg for seg in inventory if seg[0] == -1.0]
+	syllables = list(product(consonants, vowels)) #Find all possible syllables using this inventory
+	shuffle(syllables) #Shuffle the syllables
+	syllables = [list(syll) for syll in syllables] #Convert syllables to lists
+
+	#Create the withheld syllable:
+	withheld_syll = syllables.pop()
+	
+	return feat_num, withheld_syll, syllables
+	
 ##RUN SIMULATIONS##	
-train_accuracies = []
-test_accuracies = []
-loss_to_save = []
 correctness_to_save = []
 learning_curves = []
-for rep in range(reps):
+for rep in range(REPS):
 	print (" Rep: ", str(rep))
 	
+	#Erase the previous model:
+	keras.backend.clear_session()
+	
 	#Build the train/test data:
-	shuffle(syllables) #Shuffle the syllables
-	withheld_syll = [withheld_segs[0], withheld_segs[1]]
+	if SCOPE == "feature":
+		feat_num, withheld_syll, syllables = novel_feat_data()
+	elif SCOPE == "segment":
+		feat_num, withheld_syll, syllables = novel_seg_data()
+	elif SCOPE == "syllable":
+		feat_num, withheld_syll, syllables = novel_syll_data()
+	else:
+		raise Exception("Wrong scope! Must be from the set {feature, segment, syllable}.")
+	
+	
 	X = np.array(syllables)
 	Y = np.array([syll+syll for syll in syllables])
 	
 	#Build the model:
-	model = Seq2Seq(input_dim=feat_num, hidden_dim=feat_num*3,
-					output_length=len(Y[0]), output_dim=feat_num,
-					depth=2, dropout=dropout_prob)
+	model = Seq2Seq(
+						input_dim=feat_num,
+						hidden_dim=feat_num*3,
+						output_length=len(Y[0]),
+						output_dim=feat_num,
+						depth=2,
+						dropout=DROPOUT
+					)
 					
-	model.compile(	loss='mse', 
+	model.compile(	
+					loss='mse', 
 					optimizer='rmsprop'
 				  )
 	
 	#Train the model:
 	hist = model.fit(
-						 X, Y,
-						 epochs=epoch_num,
+						 X, 
+						 Y,
+						 epochs=EPOCHS,
 						 batch_size=len(X)
 					 )
 	learning_curves.append(hist.history["loss"])
@@ -115,7 +208,8 @@ for rep in range(reps):
 	withheld_OUT = np.tile(np.array(withheld_syll+withheld_syll), (1, 1, 1))
 	withheld_pred = model.predict(withheld_IN)
 		
-	#Save whether the model is doing reduplication correctly, according to our decision rule:
+	#Go through each feature in each segment of the output and check to see
+	#if it's correct:
 	test_Correct = []
 	train_Correct = []
 	for i, seg in enumerate(train_pred[0]):
@@ -128,20 +222,25 @@ for rep in range(reps):
 			
 			test_Correct.append(int(testPred_isPlus == testReal_isPlus))
 			train_Correct.append(int(trainPred_isPlus == trainReal_isPlus))
+	#Save whether or not the model was perfectly correct in training and testing:
+	#(1=success and 0=failure, so you can average the columns for overall proportion of success)
 	correctness_to_save.append([int(0 not in train_Correct), int(0 not in test_Correct)])		
 
 
-#Print a sample datum:
-print ("Test model for largest inventory...")
-print ("Trained input: ", trained_IN)
-print ("Predicted output: ", train_pred)
-print ("Withheld input: ", withheld_IN)
-print ("Predicted output: ", withheld_pred)
-
-#Save all the reps for analysis in R:
+#Save all the reps for analysis:
 cts = np.array(correctness_to_save)
-np.savetxt("Novel Features_CORRECTNESS_Dropout="+str(dropout_prob)+".csv", cts, delimiter=",", newline="\n")
+np.savetxt(
+				"novel_"+SCOPE+"_Dropout="+str(DROPOUT)+".csv",
+				cts,
+				delimiter=",",
+				header="Training Data Successes,Withheld Data Successes",
+				newline="\n",
+				comments=""
+		   )
 
 #Plot an average learning curve:
 plot(np.mean(learning_curves, axis=0))
+xlabel("Epoch")
+ylabel("Loss")
+title("Average Loss Across Repetitions")
 show()
