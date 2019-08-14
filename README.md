@@ -8,6 +8,7 @@ To run "marcus_simulations.py", you'll need the following Python packages (and P
 
 * numpy
 * scipy
+* tensorflow
 * keras
 * recurrentshop (from [this repo](https://github.com/farizrahman4u/recurrentshop))
 * seq2seq (from [this repo](https://github.com/farizrahman4u/seq2seq))
