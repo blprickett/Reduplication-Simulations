@@ -1,6 +1,8 @@
 # Reduplication Experiment Simulations
 
-The script "marcus_simulations.py" is made to simulate the experiments from Marcus et al. (1999) with a Sequence-to-Sequence neural network (Sutskever et al. 2014). The script doesn't take any input files, but it does create output files in the directory in which it's run. For more on this software and the theoretical questions that motivated it, see §4 of [this paper](https://works.bepress.com/joe_pater/38/).
+The script "marcus_simulations.py" is made to simulate the experiments from Marcus et al. (1999) with a Sequence-to-Sequence neural network (Sutskever et al. 2014). The script doesn't take any input files, but it does create output files in the directory in which it's run. For more on this software and the theoretical questions that motivated it, see §4 of [this manuscript](https://works.bepress.com/joe_pater/38/).
+
+The script "generalization_scope_tests.py" is made to more carefully test how the model generalizes after learning a reduplicative pattern. To do this, Berent's (2013) *scopes of generalization* are used: novel syllables (or words), novel segments, and novel feature values. The script doesn't take any input files, but it does create output files in the directory in which it's run. For more on this software and the theoretical questions that motivated it, see §5 of [this manuscript](https://works.bepress.com/joe_pater/38/).
 
 ## Dependencies
 
@@ -28,7 +30,14 @@ The script "marcus_simulations.py" takes the following arguments (in this order)
 * Vocabulary size: how many randomly-created words are present in pretraining?
 * Reduplication probability in pretraining: what proportion (above chance) of the pretraining contains "ABB" reduplicated forms?
 
+So, for example, if you wanted to simulate Marcus et al.'s second experiment's ABB condition, for five repetitions, each of which had 1000 epochs of pretraining (and 500 epochs of training), with a model whose units drop out 50% of the time, with a pretraining vocabulary of 1000 words and no reduplication added to that pretraining, you would run the following command line:
+
+```bash
+python marcus_simulations.py 2 5 1000 .5 ABB 1000 0
+```
+
 ## References
+* Berent, I. (2013). The phonological mind. *Trends in cognitive sciences, 17(7)*, 319-327.
 * Endress, A. D., Dehaene-Lambertz, G., & Mehler, J. (2007). Perceptual constraints and the learnability of simple grammars. *Cognition, 105(3)*, 577-614.
 * Marcus, G. F., Vijayan, S., Rao, S. B., & Vishton, P. M. (1999). Rule learning by seven-month-old infants. *Science, 283(5398)*, 77-80.
 * Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. In *Advances in neural information processing systems* (pp. 3104-3112).
