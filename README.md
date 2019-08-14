@@ -36,6 +36,19 @@ So, for example, if you wanted to simulate Marcus et al.'s second experiment's A
 python marcus_simulations.py 2 5 1000 .5 ABB 1000 0
 ```
 
+The script "generalization_scope_tests.py" takes the following arguments (in this order):
+
+* Epoch number: this corresponds to how many epochs you want in pretraining (per repetition). This number is halved to produce the number of epochs in training for the experiment simulation.
+* Repetition number: this corresponds to how many repetitions of the simulation you want to run.
+* Dropout probability: how likely is each unit in the model to be dropped out during training?
+* Scope: which scope of generalization are we testing the model on? Should be either "feature" for novel feature values, "segment" for novel segments, or "syllable" for novel syllables.
+
+So, for example, if you wanted to run a five-repetition-long test on the model's ability to generalize to novel segments after training for 100 epochs with a dropout probability of .5, you would run the following command line:
+
+```bash
+python generalization_scope_tests.py 100 5 .5 segment
+```
+
 ## References
 * Berent, I. (2013). The phonological mind. *Trends in cognitive sciences, 17(7)*, 319-327.
 * Endress, A. D., Dehaene-Lambertz, G., & Mehler, J. (2007). Perceptual constraints and the learnability of simple grammars. *Cognition, 105(3)*, 577-614.
