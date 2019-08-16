@@ -23,7 +23,7 @@ To run these scripts, you'll need the following Python packages (and Python 3):
 
 The script "marcus_simulations.py" takes the following arguments (in this order):
 
-* Experiment: this corresponds to which experiment you want to simulate should be "1", "2", or "3". Techinally, "3" simulates the replication of Marcus et al.'s (1999) experiment that was performed by Endress et al. (2007).
+* Experiment: this corresponds to which experiment you want to simulate (should be "1", "2", or "3"). Techinally, "3" simulates the replication of Marcus et al.'s (1999) experiment that was performed by Endress et al. (2007).
 * Repetition number: this corresponds to how many repetitions of the simulation you want to run.
 * Epoch number: this corresponds to how many epochs you want in pretraining (per repetition). This number is halved to produce the number of epochs in training for the experiment simulation.
 * Dropout probability: how likely is each unit in the model to be dropped out during training?
