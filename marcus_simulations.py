@@ -17,6 +17,10 @@ VOCAB_SIZE = int(argv[6]) #Number of words in pretraining
 REDUP_IN_PT = float(argv[7]) #What's the probability of seeing reduplication in pretraining (this pretends that chance is 0)
 ################################ 
 
+#Catch an error (only Experiment 1 can deal with redup in pretraining)
+if EXP != '1' and REDUP_IN_PT > 0:
+	raise Exception ("Currently, only Experiment 1 is designed to use reduplication in pretraining!")
+
 #Create the correct data for the given experiment:
 if EXP == '1':
 	train_ABA = [
@@ -34,21 +38,21 @@ if EXP == '1':
 	test_ABB = ["wofefe", "dekoko"] * 3
 	test_ABA = ["wofewo", "dekode"] * 3
 	
-	FEAT_CONVERT = {	#syll	son		voice	cor		cont	lab		vel 	nasal 	high	low 	back
-						"t": [-1.0,	-1.0,	-1.0,	1.0, 	-1.0,	0.0,	0.0,	-1.0,	0.0,	0.0, 	0.0],
-						"d": [-1.0,	-1.0,	1.0,	1.0, 	-1.0,	0.0,	0.0,	-1.0,	0.0,	0.0, 	0.0],
-						"k": [-1.0,	-1.0,	-1.0,	0.0, 	-1.0,	0.0,	1.0,	-1.0,	0.0,	0.0, 	0.0],
-						"g": [-1.0,	-1.0,	1.0,	0.0, 	-1.0,	0.0,	1.0,	-1.0,	0.0,	0.0, 	0.0],
-						"f": [-1.0,	-1.0,	-1.0,	0.0, 	1.0,	1.0,	0.0,	-1.0,	0.0,	0.0, 	0.0],
-						"w": [-1.0,	1.0,	0.0,	0.0, 	0.0,	1.0,	1.0,	-1.0,	1.0,	-1.0, 	1.0],
-						"l": [-1.0,	1.0,	0.0,	1.0, 	0.0,	0.0,	0.0,	-1.0,	0.0,	0.0, 	0.0],
-						"n": [-1.0,	1.0,	0.0,	1.0, 	0.0,	0.0,	0.0,	1.0,	0.0,	0.0, 	0.0],
-						"a": [1.0,	1.0,	0.0,	0.0, 	0.0,	0.0,	0.0,	-1.0,	-1.0,	1.0, 	1.0],
-						"i": [1.0,	1.0,	0.0,	0.0, 	0.0,	0.0,	0.0,	-1.0,	1.0,	-1.0, 	-1.0],
-						"o": [1.0,	1.0,	0.0,	0.0, 	0.0,	0.0,	0.0,	-1.0,	-1.0,	-1.0, 	1.0],
-						"e": [1.0,	1.0,	0.0,	0.0, 	0.0,	0.0,	0.0,	-1.0,	-1.0,	-1.0, 	-1.0]
+	FEAT_CONVERT = {			#syll	#smntc son  voice	cor		cont	lab		vel 	nasal  high	    low 	back
+					       "t": [-1.0,	0.0,  -1.0,	-1.0,	1.0, 	-1.0,	0.0,	0.0,	-1.0,	0.0,	0.0, 	0.0],
+					       "d": [-1.0,	0.0,  -1.0,	1.0,	1.0, 	-1.0,	0.0,	0.0,	-1.0,	0.0,	0.0, 	0.0],
+					       "k": [-1.0,	0.0,  -1.0,	-1.0,	0.0, 	-1.0,	0.0,	1.0,	-1.0,	0.0,	0.0, 	0.0],
+					       "g": [-1.0,	0.0,  -1.0,	1.0,	0.0, 	-1.0,	0.0,	1.0,	-1.0,	0.0,	0.0, 	0.0],
+					       "f": [-1.0,	0.0,  -1.0,	-1.0,	0.0, 	1.0,	1.0,	0.0,	-1.0,	0.0,	0.0, 	0.0],
+					       "w": [-1.0,	0.0,  1.0,	0.0,	0.0, 	0.0,	1.0,	1.0,	-1.0,	1.0,	-1.0, 	1.0],
+					       "l": [-1.0,	0.0,  1.0,	0.0,	1.0, 	0.0,	0.0,	0.0,	-1.0,	0.0,	0.0, 	0.0],
+					       "n": [-1.0,	0.0,  1.0,	0.0,	1.0, 	0.0,	0.0,	0.0,	1.0,	0.0,	0.0, 	0.0],
+				           "a": [1.0,	0.0,  1.0,	0.0,	0.0, 	0.0,	0.0,	0.0,	-1.0,	-1.0,	1.0, 	1.0],
+					       "i": [1.0,	0.0,  1.0,	0.0,	0.0, 	0.0,	0.0,	0.0,	-1.0,	1.0,	-1.0, 	-1.0],
+					       "o": [1.0,	0.0,  1.0,	0.0,	0.0, 	0.0,	0.0,	0.0,	-1.0,	-1.0,	-1.0, 	1.0],
+					       "e": [1.0,	0.0,  1.0,	0.0,	0.0, 	0.0,	0.0,	0.0,	-1.0,	-1.0,	-1.0, 	-1.0]
 
-					}
+				}
 elif EXP == '2':
 	train_ABA = [
 					"ledile", "lejele", "lelile", "lewele", 
@@ -191,10 +195,13 @@ else:
 	aba_losses = []
 
 #Running the simulations:
-learning_curves = []
-pretraining_curves = []
-abb_losses = []
-training_losses = []
+learning_curves = [] #Keeps track of loss in experiment sim
+pretraining_curves = [] #Keeps track of loss in pretraining
+abb_losses = [] #keeps track of loss values for ABB words
+training_losses = [] #keeps track of loss on training data each run
+make_ABB = lambda x : x[:1]+[1.0]+x[1+1:] #Adds semantic information
+make_ABA = lambda x : x[:1]+[-1.0]+x[1+1:] #Adds semantic information
+
 for rep in range(REPS):
 	print ("Rep: "+str(rep))
 	
@@ -225,15 +232,23 @@ for rep in range(REPS):
 		##Putting reduplication in training:
 			if np.random.rand() < REDUP_IN_PT:
 				syll_alpha = choice(all_sylls)
-				string_X = choice(all_sylls)+syll_alpha #AB...
-		  
-				string_Y = syll_alpha #...B
+				template = choice(["ABB", "ABA"])
+				if template == "ABB":
+					string_X = choice(all_sylls)+syll_alpha #First two sylls
+					vector_X = [make_ABB(FEAT_CONVERT[seg]) for seg in string_X] #Add semantic info, convert to vector
+				elif template == "ABA":
+				    string_X = syll_alpha+choice(all_sylls) #First two sylls
+				    vector_X = [make_ABA(FEAT_CONVERT[seg]) for seg in string_X] #Add semantic info, convert to vector
+				
+				string_Y = syll_alpha #Third syllable
+				
+				
 			else:
-			  string_X = choice(all_sylls)+choice(all_sylls)
-			  string_Y = choice(all_sylls)
-
-			vector_X = [FEAT_CONVERT[seg] for seg in string_X]
-			vector_Y = [FEAT_CONVERT[seg] for seg in string_Y]
+				string_X = choice(all_sylls)+choice(all_sylls) #First two sylls
+				string_Y = choice(all_sylls) #Third syllable
+				vector_X = [FEAT_CONVERT[seg] for seg in string_X] #Convert to vector
+			  
+			vector_Y = [FEAT_CONVERT[seg] for seg in string_Y] #Convert to vector
 			
 			irl_X.append(vector_X)
 			irl_Y.append(vector_Y)
