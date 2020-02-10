@@ -12,7 +12,7 @@ To run these scripts, you'll need the following Python packages (and Python 3):
 * scipy
 * tensorflow
 * keras
-* recurrentshop (from [this repo](https://github.com/farizrahman4u/recurrentshop))
+* recurrentshop (from [this repo](https://github.com/blprickett/recurrentshop))
 * seq2seq (from [this repo](https://github.com/farizrahman4u/seq2seq))
 * sys
 * random
