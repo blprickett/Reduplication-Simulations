@@ -4,6 +4,13 @@ The script "marcus_simulations.py" is made to simulate the experiments from Marc
 
 The script "generalization_scope_tests.py" is made to more carefully test how the model generalizes after learning a reduplicative pattern. To do this, Berent's (2013) *scopes of generalization* are used: novel syllables (or words), novel segments, and novel feature values. The script doesn't take any input files, but it does create output files in the directory in which it's run. For more on this software and the theoretical questions that motivated it, see §5 of [this manuscript](https://works.bepress.com/joe_pater/38/).
 
+If you'd like to run these in Google Colab, instead of on your own machine, I've alread set-up notebooks for that here:
+
+* [Marcus Simulation](https://colab.research.google.com/drive/1BAsYeGrqH840B435iOZiodbupmrJkXzM)
+* [Generalization Scope Tests](https://colab.research.google.com/drive/1WJfOlOWHKL63IueR5UEz4WFmONagjGly)
+
+All you'll need to run these is a Google account and a folder named "Reduplication_Output" in your Google Drive.
+
 ## Dependencies
 
 To run these scripts, you'll need the following Python packages (and Python 3):
