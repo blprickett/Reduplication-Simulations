@@ -17,7 +17,7 @@ To run these scripts, you'll need Python 3 and the following Python packages:
 * matplotlib
 * itertools
 
-(Note that an earlier version of these scripts used recurrentshop from [this repo](https://github.com/blprickett/recurrentshop) and seq2seq from [this repo](https://github.com/farizrahman4u/seq2seq). However, these have been replaced with the Seq2Seq.py file included in this repo. If you get slightly different results from what we report in the paper, this difference in likely the reason).
+(Note that an earlier version of these scripts used recurrentshop from [this repo](https://github.com/blprickett/recurrentshop) and seq2seq from [this repo](https://github.com/farizrahman4u/seq2seq). However, these have been replaced with the Seq2Seq.py file included here. If you get slightly different results from what we report in the paper, this difference in likely the reason).
 
 ## Command line arguments
 
