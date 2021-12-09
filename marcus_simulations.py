@@ -1,8 +1,7 @@
 import numpy as np
 import scipy.stats as sp
 import keras
-import seq2seq
-from seq2seq.models import Seq2Seq
+import Seq2Seq
 from sys import argv
 from random import choice, shuffle
 from matplotlib.pyplot import plot, ylabel, show, legend, xlabel
@@ -16,6 +15,7 @@ PATTERN = argv[5] #Choose between "ABB" and "ABA"
 VOCAB_SIZE = int(argv[6]) #Number of words in pretraining 
 REDUP_IN_PT = float(argv[7]) #What's the probability of seeing reduplication in pretraining (this pretends that chance is 0)
 ################################ 
+
 
 #Catch an error (only Experiment 1 can deal with redup in pretraining)
 if EXP != '1' and REDUP_IN_PT > 0:
@@ -209,19 +209,17 @@ for rep in range(REPS):
 	keras.backend.clear_session() 
   
 	#Build the new model:
-	model = Seq2Seq(
+	model = Seq2Seq.seq2seq(
 						input_dim=FEAT_NUM,
 						hidden_dim=FEAT_NUM,
 						output_length=2,
 						output_dim=FEAT_NUM,
-						depth=2,
+            batch_size=1,
+            learn_rate=0.001,
+            layer_type="lstm",
 						dropout=DROPOUT
 					)
-					
-	model.compile(	
-					loss='mse', 
-					optimizer='rmsprop'
-				  )
+	
 				  
 	#PRETRAINING
 	if VOCAB_SIZE > 0:
@@ -254,17 +252,16 @@ for rep in range(REPS):
 			irl_Y.append(vector_Y)
 		irl_X = np.array(irl_X)
 		irl_Y = np.array(irl_Y)
-		decoder_init = model.decoder.get_weights()
-		irl_curve = model.fit(
+#		decoder_init = model.decoder.get_weights()
+		irl_curve = model.train(
 								irl_X, 
 								irl_Y,
-								epochs=EPOCHS,
-								batch_size=50,
-								verbose=0
+								epoch_num=EPOCHS,
+                print_every=EPOCHS
 							  )
-		model.decoder.set_weights(decoder_init) #Set the decoder back to its initial weights.
-		pretraining_curves.append(irl_curve.history["loss"])
-	
+#		model.decoder.set_weights(decoder_init) #Set the decoder back to its initial weights (need to get this to work with new Seq2Seq package!)
+		pretraining_curves.append(irl_curve["Loss"])
+
 	
 	#SIMULATE EXPERIMENT
 	#Randomize training order:
@@ -278,32 +275,37 @@ for rep in range(REPS):
 	
 	#Train the model:
 	print("Simulating experiment...Rep="+str(rep))
-	hist = model.fit(
+	hist = model.train(
 						X, 
 						Y,
-						epochs=int(np.ceil(EPOCHS/2)),
-						batch_size=50,
-						verbose=0
+						epoch_num=int(np.ceil(EPOCHS/2)),
+						print_every=int(np.ceil(EPOCHS/2))
 					 )
-	learning_curves.append(hist.history["loss"])
+	learning_curves.append(hist["Loss"])
+ 
+ 
 	
 	#Marcus et al's testing phase:
 	print("Testing model...Rep="+str(rep))
-	
-	abb_loss = model.test_on_batch(test_ABB_x, test_ABB_y)
+	abb_loss = np.square(np.subtract(test_ABB_y.flatten(),model.predict(test_ABB_x).flatten())).mean()
+	#abb_loss = model.test_on_batch(test_ABB_x, test_ABB_y)
 	abb_losses.append(str(abb_loss))
 	
-	training_loss = model.test_on_batch(X, Y)
+	training_loss = np.square(np.subtract(Y.flatten(),model.predict(X).flatten())).mean()
+	#training_loss = model.test_on_batch(X, Y)
 	training_losses.append(str(training_loss))
 	
 	if EXP == "3":
-		aab_loss = model.test_on_batch(test_AAB_x, test_AAB_y)
+		aab_loss = np.square(np.subtract(test_AAB_y.flatten(),model.predict(test_AAB_x).flatten())).mean()
+		#aab_loss = model.test_on_batch(test_AAB_x, test_AAB_y)
 		aab_losses.append(str(aab_loss))
 	
-		aaa_loss = model.test_on_batch(test_AAA_x, test_AAA_y)
+		aaa_loss =  np.square(np.subtract(test_AAA_y.flatten(),model.predict(test_AAA_x).flatten())).mean() 
+		#aaa_loss = model.test_on_batch(test_AAA_x, test_AAA_y)
 		aaa_losses.append(str(aaa_loss))
 	else:
-		aba_loss = model.test_on_batch(test_ABA_x, test_ABA_y)
+		aba_loss = np.square(np.subtract(test_ABA_y.flatten(),model.predict(test_ABA_x).flatten())).mean() 
+		#aba_loss = model.test_on_batch(test_ABA_x, test_ABA_y)
 		aba_losses.append(str(aba_loss))
 	
 #Print correctness over all reps:
