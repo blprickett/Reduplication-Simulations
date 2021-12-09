@@ -1,7 +1,6 @@
 import numpy as np
 import keras
-import seq2seq
-from seq2seq.models import Seq2Seq
+import Seq2Seq
 from sys import argv
 from random import choice, shuffle
 from itertools import product
@@ -175,28 +174,25 @@ for rep in range(REPS):
 	Y = np.array([syll+syll for syll in syllables])
 	
 	#Build the model:
-	model = Seq2Seq(
+	model = Seq2Seq.seq2seq(
 						input_dim=feat_num,
 						hidden_dim=feat_num*3,
-						output_length=len(Y[0]),
-						output_dim=feat_num,
-						depth=2,
-						dropout=DROPOUT
+						output_length=Y.shape[1],
+						output_dim=Y.shape[2],
+            					batch_size=1,
+            					learn_rate=0.001,
+					  	layer_type="lstm",
+            					dropout=DROPOUT
 					)
-					
-	model.compile(	
-					loss='mse', 
-					optimizer='rmsprop'
-				  )
 	
 	#Train the model:
-	hist = model.fit(
+	hist = model.train(
 						 X, 
 						 Y,
-						 epochs=EPOCHS,
-						 batch_size=len(X)
+						 epoch_num=EPOCHS,
+						 print_every=10
 					 )
-	learning_curves.append(hist.history["loss"])
+	learning_curves.append(hist["Loss"])
 					 
 	#Test the model on trained data:
 	trained_IN = np.tile(X[0], (1, 1, 1))
